@@ -1,0 +1,267 @@
+/*
+ * 6TiSCH ANALYZER: ALL METRICS (+ UMAY MOBILITY)
+ * Rapor Araligi: 1 DAKIKA (TEST MODE)
+ */
+
+TIMEOUT(4000000); 
+var STOP_TIME = 3600000000; /* 60 Dakika */
+
+var PRINT_INTERVAL = 60000000; /* 1 Dakika = 60,000,000 us */
+var next_print_time = PRINT_INTERVAL;
+
+var nodes = {};
+var sent_times = {}; /* PDR Latency icin */
+
+/* Mobility States */
+var lost_times = {};    // timestamp
+var cached_counts = {}; // cell count
+
+/* Global Network Stats */
+var global_hello_tx = 0;
+var global_hello_rx = 0;
+var global_latency_sum = 0;
+var global_latency_count = 0;
+
+function getSenderIdFromIp(ipString) {
+  if (!ipString) return -1;
+  var parts = ipString.trim().split(":");
+  var lastPart = parts[parts.length - 1];
+  return parseInt(lastPart, 16); 
+}
+
+function initNode(id) {
+    if (!nodes[id]) {
+      nodes[id] = { 
+        add: 0, list: 0, del_cnt: 0, succ: 0, fail: 0, total: 0, 
+        dio_tx: 0, dio_rx: 0, dao_tx: 0, dao_rx: 0, dis_tx: 0, dis_rx: 0,
+        hello_tx: 0, hello_rx: 0,
+        
+        /* Mobility Metrics */
+        reconn_sum: 0, reconn_count: 0,
+        reuse_sum: 0, reuse_count: 0
+      };
+    }
+    if (!sent_times[id]) sent_times[id] = {};
+}
+
+function printStats() {
+  log.log("\n========== ISTATISTIK RAPORU (" + (time/1000000.0).toFixed(2) + " sn) ==========\n");
+  
+  var keys = [];
+  for (var k in nodes) keys.push(parseInt(k, 10));
+  keys.sort(function(a, b) { return a - b; });
+
+  /* --- TABLO 1: MOBILITE & 6P --- */
+  log.log("[TABLO 1: MOBILITE (UMAY) & 6P KONTROL]\n");
+  log.log("Node | Avg Delay(ms)| Avg Reuse(%) | ADD | DEL | SUCC | FAIL\n");
+  log.log("-----|--------------|--------------|-----|-----|------|-----\n");
+
+  var s_add=0, s_del=0, s_succ=0, s_fail=0;
+  var rpl_dio_tx=0, rpl_dio_rx=0, rpl_dao_tx=0, rpl_dao_rx=0, rpl_dis_tx=0, rpl_dis_rx=0;
+
+  for (var i = 0; i < keys.length; i++) {
+    var id = keys[i];
+    var n = nodes[id];
+    
+    // Avg Reconnection Delay
+    var avg_rd = 0.0;
+    if (n.reconn_count > 0) avg_rd = n.reconn_sum / n.reconn_count;
+    
+    // Avg Cell Reuse Rate
+    var avg_cr = 0.0;
+    if (n.reuse_count > 0) avg_cr = n.reuse_sum / n.reuse_count;
+
+    log.log("  " + id + "  |    " + avg_rd.toFixed(1) + "     |    " + avg_cr.toFixed(1) + "     |  " + n.add + "  |  " + n.del_cnt + "  |  " + n.succ + "  |  " + n.fail + "\n");
+    s_add += n.add; s_del += n.del_cnt; s_succ += n.succ; s_fail += n.fail;
+    
+    rpl_dio_tx += n.dio_tx; rpl_dio_rx += n.dio_rx; 
+    rpl_dao_tx += n.dao_tx; rpl_dao_rx += n.dao_rx; 
+    rpl_dis_tx += n.dis_tx; rpl_dis_rx += n.dis_rx;
+  }
+  log.log("-----|--------------|--------------|-----|-----|------|-----\n");
+
+  /* --- TABLO 2: RPL --- */
+  log.log("\n[TABLO 2: RPL KONTROL MESAJLARI (Tx: Gonderilen)]\n");
+  log.log("Node | DIO_Tx| DIO_Rx| DAO_Tx| DAO_Rx| DIS_Tx| DIS_Rx\n"); 
+  for (var i = 0; i < keys.length; i++) {
+    var id = keys[i];
+    var n = nodes[id];
+    log.log("  " + id + "  |   " + n.dio_tx + "   |   " + n.dio_rx + "   |   " + n.dao_tx + "   |   " + n.dao_rx + "   |   " + n.dis_tx + "   |   " + n.dis_rx + "\n");
+  }
+
+  /* --- HESAPLAMALAR --- */
+  // 1. DATA PDR (HELLO)
+  var hello_pdr = 0;
+  var avg_latency = 0;
+  if (global_hello_tx > 0) hello_pdr = (global_hello_rx * 100.0) / global_hello_tx;
+  if (global_latency_count > 0) avg_latency = global_latency_sum / global_latency_count;
+
+  // 2. RPL DAO PDR (End-to-End)
+  // Sadece Root (ID:1) tarafindan alinan DAO'lari, Toplam Uretilen (Tx) DAO'lara boluyoruz.
+  var root_dao_rx = 0;
+  if (nodes[1]) root_dao_rx = nodes[1].dao_rx;
+  
+  var dao_e2e_pdr = 0;
+  if (rpl_dao_tx > 0) dao_e2e_pdr = (root_dao_rx * 100.0) / rpl_dao_tx;
+
+  log.log("\n##################################################\n");
+  log.log("# NETWORK SUMMARY (AG OZETI)                     #\n");
+  log.log("##################################################\n");
+  log.log("# DATA PDR (HELLO)     : % " + hello_pdr.toFixed(2) + " (Tx:" + global_hello_tx + " / Rx:" + global_hello_rx + ")\n");
+  log.log("# ORTALAMA GECIKME     : " + avg_latency.toFixed(2) + " ms\n");
+  log.log("# ---------------------------------------------- #\n");
+  log.log("# TOTAL RPL MSG (Tx)   : DIO:" + rpl_dio_tx + " / DAO:" + rpl_dao_tx + " / DIS:" + rpl_dis_tx + "\n");
+  log.log("# TOTAL RPL MSG (Rx)   : DIO:" + rpl_dio_rx + " / DAO:" + rpl_dao_rx + " / DIS:" + rpl_dis_rx + "\n");
+  log.log("# ---------------------------------------------- #\n");
+  log.log("# RPL DAO E2E PDR      : % " + dao_e2e_pdr.toFixed(2) + " (Root Rx: " + root_dao_rx + " / Total Tx: " + rpl_dao_tx + ")\n");
+  log.log("##################################################\n");
+  log.log("==============================================================\n");
+}
+
+while (true) {
+  /* 1. BITIS */
+  if (time >= STOP_TIME) {
+      log.log("\n>>> SIMULASYON BITTI (60 DK) <<<\n");
+      printStats();
+      log.testOK();
+      break; 
+  }
+
+  /* 2. ARA RAPOR */
+  if (time >= next_print_time) {
+      log.log("\n>>> ARA RAPOR (" + (next_print_time/60000000) + ". Dakika) <<<\n");
+      printStats();
+      next_print_time += PRINT_INTERVAL;
+  }
+
+  /* 3. LOG ANALIZI */
+  if (msg) {
+    initNode(id);
+    var s = nodes[id];
+
+    /* --- UMAY 1: RECONNECTION DELAY --- */
+    if (msg.indexOf("[UMAY] LINK_LOST") >= 0) {
+        lost_times[id] = time;
+    }
+    else if (msg.indexOf("[UMAY] RECONNECTED") >= 0) {
+        if (lost_times[id]) {
+            var diff = (time - lost_times[id]) / 1000.0; // ms
+            s.reconn_sum += diff;
+            s.reconn_count++;
+            delete lost_times[id];
+        }
+    }
+
+    /* --- UMAY 2: CELL REUSE RATE --- */
+    if (msg.indexOf("[UMAY] CACHED:") >= 0) {
+        // Log Format: "[UMAY] CACHED: 5 parent ..."
+        try {
+            var parts = msg.split(":"); // ["...CACHED", " 5 parent ..."]
+            if (parts.length > 1) {
+                var countStr = parts[1].trim().split(" ")[0];
+                var cached = parseInt(countStr);
+                if (!isNaN(cached)) {
+                    cached_counts[id] = cached;
+                }
+            }
+        } catch(e) {}
+    }
+    else if (msg.indexOf("[UMAY] RESTORED:") >= 0) {
+        // Log Format: "[UMAY] RESTORED: 4 parent ..."
+        try {
+            var parts = msg.split(":");
+            if (parts.length > 1) {
+                var countStr = parts[1].trim().split(" ")[0];
+                var restored = parseInt(countStr);
+                
+                // Eger cache verisi varsa oran hesapla
+                // Eger cache 0 ise reuse da 0'dir (bolme hatasi yapma)
+                if (!isNaN(restored) && cached_counts[id] !== undefined) {
+                    var cached = cached_counts[id];
+                    var rate = 0;
+                    if (cached > 0) {
+                        rate = (restored * 100.0) / cached;
+                    } 
+                    if (rate > 100) rate = 100;
+                    
+                    s.reuse_sum += rate;
+                    s.reuse_count++;
+                    
+                    delete cached_counts[id]; // Sifirla
+                }
+            }
+        } catch(e) {}
+    }
+
+    /* --- 6P --- */
+    if (msg.indexOf("Send ADD") >= 0 || msg.indexOf("Add request reached") >= 0) { s.add++; s.total++; }
+    else if (msg.indexOf("Send LIST") >= 0 || msg.indexOf("List request reached") >= 0) { s.list++; s.total++; }
+    else if (msg.indexOf("Send DELETE") >= 0 || msg.indexOf("Delete request reached") >= 0) { s.del_cnt++; s.total++; }
+    else if (msg.indexOf("Send SUCCESS") >= 0 || msg.indexOf("cmd ADD rc SUCCESS") >= 0) { s.succ++; s.total++; }
+    else if (msg.indexOf("FAILED") >= 0 || msg.indexOf("RSC: FAILED") >= 0) { s.fail++; s.total++; }
+  
+    /* --- RPL --- */
+    if (msg.indexOf("RPL") >= 0) {
+        // Log eslesmesi: "Received" veya "received" yakalamak icin bas harfi atliyoruz
+        if (msg.indexOf("Received a DIO") >= 0) { s.dio_rx++; }
+        if (msg.indexOf("Sending a DIO") >= 0 || msg.indexOf("Sending a multicast-DIO") >= 0) { s.dio_tx++; }
+        
+        if (msg.indexOf("Received a DAO") >= 0) { s.dao_rx++; }
+        if (msg.indexOf("Sending a DAO") >= 0) { s.dao_tx++; }
+        
+        if (msg.indexOf("Received a DIS") >= 0) { s.dis_rx++; }
+        if (msg.indexOf("Sending a DIS") >= 0) { s.dis_tx++; }
+    }
+    
+    /* --- PDR & LATENCY --- */
+    if (msg.indexOf("Sending HELLO") >= 0) {
+        try {
+            var parts = msg.split(" ");
+            var count = -1;
+            for (var i=0; i<parts.length; i++) {
+                if (parts[i] === "HELLO" && i+1 < parts.length) {
+                    count = parseInt(parts[i+1]);
+                    break;
+                }
+            }
+            if (count >= 0) {
+                s.hello_tx++;
+                global_hello_tx++;
+                sent_times[id][count] = time;
+            }
+        } catch(e) {}
+    }
+
+    if (msg.indexOf("Received HELLO") >= 0 && msg.indexOf("from") >= 0) {
+        try {
+            var parts = msg.split(" ");
+            var count = -1;
+            for (var i=0; i<parts.length; i++) {
+                if (parts[i] === "HELLO" && i+1 < parts.length) {
+                    count = parseInt(parts[i+1]);
+                    break;
+                }
+            }
+            var splitFrom = msg.split("from");
+            if (splitFrom.length > 1 && count >= 0) {
+                var senderIp = splitFrom[1].trim().split(" ")[0];
+                var senderId = getSenderIdFromIp(senderIp);
+                if (senderId > 0) {
+                    initNode(senderId);
+                    nodes[senderId].hello_rx++;
+                    global_hello_rx++;
+                    if (sent_times[senderId] && sent_times[senderId][count]) {
+                        var startTime = sent_times[senderId][count];
+                        var latUs = time - startTime; 
+                        global_latency_sum += (latUs / 1000.0);
+                        global_latency_count++;
+                        delete sent_times[senderId][count];
+                    }
+                }
+            }
+        } catch(e) { }
+    }
+  }
+
+  YIELD();
+}
