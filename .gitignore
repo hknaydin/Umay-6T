@@ -1,0 +1,20 @@
+# Cooja / Contiki OS gitignore
+build/
+obj_*
+symbols.c
+symbols.h
+*.log
+*.testlog
+*.pcap
+*.cooja_log
+COOJA.testlog
+seeder*
+*~
+*.swp
+.DS_Store
+__pycache__/
+*.pyc
+
+# IDEs
+.vscode/
+.idea/
