@@ -1,68 +1,143 @@
-# Mobility Trace Files (30-node & 40-node Scenarios)
+# 6TiSCH Hareketlilik Değerlendirme Projesi (Detaylı Teknik Dokümantasyon)
 
-This repository provides the mobility trace (`.dat`) files used in the experimental evaluation of our paper.
+Bu proje, **Nesnelerin İnterneti (IoT)** alanında, özellikle **6TiSCH** (IPv6 over the TSCH mode of IEEE 802.15.4e) protokol yığınının hareketli (mobil) ağlardaki performansını değerlendirmek için oluşturulmuş kapsamlı bir simülasyon ortamıdır.
 
-The goal of sharing these traces is to ensure reproducibility: the same node movements can be replayed by other researchers under identical simulation settings.
-
----
-
-## 1. Mobility Model and Trace Generation
-
-- Trace generator: **BonnMotion**
-- Mobility model: **Random Waypoint (RWP)**
-
-The traces were generated offline and exported as position files. Each file contains time-indexed (x,y) coordinates for each mobile node.
+Bu doküman, projeyi tüm teknik detaylarıyla, kod analiziyle ve mimari yapısıyla bir ders kitabı niteliğinde anlatmak için hazırlanmıştır.
 
 ---
 
-## 2. Scenarios Included
+## 📚 İçindekiler
 
-Two network sizes are provided:
-
-### A) 30-node scenario
-All traces under:
-`mobility-traces/30-nodes/`
-
-### B) 40-node scenario
-All traces under:
-`mobility-traces/40-nodes/`
-
-> Each scenario folder contains multiple `.dat` files corresponding to different mobility parameter sets (e.g., different speed/pause configurations).
+1.  [Proje Mimarisi](#1-proje-mimarisi)
+2.  [Simülasyon Yapısı (.csc Analizi)](#2-simülasyon-yapısı-csc-analizi)
+3.  [Kod Analizi (cooja_analysis.js)](#3-kod-analizi-cooja_analysisjs)
+4.  [Veri Formatları (.dat)](#4-veri-formatları-dat)
+5.  [Nasıl Çalıştırılır?](#5-nasıl-çalıştırılır)
 
 ---
 
-## 3. File Format (`.dat`)
+## 1. Proje Mimarisi
 
-Each `.dat` file is a plain text file where each line encodes the position of a node at a given time:
+Bu proje üç ana bileşenin birleşiminden oluşur:
 
-<node_id> <time_seconds> <x_meters> <y_meters>
+1.  **Contiki-NG İşletim Sistemi**: IoT cihazları için geliştirilmiş, açık kaynaklı, düşük güç tüketimli bir işletim sistemidir. Bu projede ağ protokol yığını (IPv6, RPL, 6LoWPAN, TSCH) Contiki-NG tarafından sağlanır.
+2.  **Cooja Simülatörü**: Contiki ağlarını emüle eden güçlü bir simülatördür. Gerçek donanım kodunu (C kodu) derleyip sanal cihazlarda (Motes) çalıştırır.
+3.  **BonnMotion**: Hareketlilik izlerini (mobility traces) oluşturmak için kullanılan bir araçtır. Düğümlerin zaman içindeki (x, y) koordinatlarını belirler.
 
-Example:
-0 0.0 0.00 10.00
-1 0.0 12.34 41.60
-1 2.0 23.34 25.50
-
-- `node_id`: Integer identifier of the node
-- `time_seconds`: Simulation time (seconds)
-- `x_meters`, `y_meters`: Node coordinates in meters
-
----
-
-## 4. How to Use
-
-1) Select the scenario folder (30-nodes or 40-nodes).
-2) Choose the desired `.dat` trace file.
-3) Load the trace file into your simulator / mobility replay tool (e.g., by mapping node IDs to trace node IDs).
+### Çalışma Mantığı
+Simülasyon başladığında:
+1.  Cooja, `experiments/` klasöründeki `.csc` dosyasını okur.
+2.  Sanal düğümleri (Motes) oluşturur ve onlara Contiki-NG firmware'ini yükler.
+3.  `mobility-traces/` klasöründeki `.dat` dosyasını okuyarak düğümleri simülasyon alanında hareket ettirir.
+4.  Düğümler arasındaki radyo iletişimi **UDGM (Unit Disk Graph Medium)** modeli ile simüle edilir.
+5.  `scripts/cooja_analysis.js` dosyası, simülasyon çıktısını (logları) anlık olarak dinler ve performans metriklerini (PDR, Gecikme vb.) hesaplar.
 
 ---
 
-## 5. Notes on Naming
+## 2. Simülasyon Yapısı (.csc Analizi)
 
-Some files may follow a compact naming scheme such as:
+Simülasyon dosyaları (`.csc`), XML formatındadır ve deneyin tüm parametrelerini tanımlar.
 
-positions_h_<pause>_l_<speed>.dat
+### 2.1. Radyo Ortamı (Radio Medium)
+Simülasyonda **Unit Disk Graph Medium (UDGM)** kullanılmıştır.
+- **Transmitting Range (50m)**: Bir düğümün sinyalinin kesin olarak ulaşabileceği mesafe.
+- **Interference Range (100m)**: Sinyalin gürültü yaratıp diğer iletişimleri bozabileceği mesafe.
+- **Tx/Rx Success Ratio (1.0)**: Paket kaybı oranı. 1.0 olması, menzil içindeki iletimlerin %100 başarılı olacağını (ideal ortam) varsayar.
 
-If you need, you can rename files into a more explicit format such as:
+### 2.2. Düğüm Tipleri (Mote Types)
+Kullanılan donanım modeli **MSP430 (Exp5438)** platformudur. Bu, gerçekçi bir donanım emülasyonu sağlar.
+- **Firmware**: `border-router-server` (Kök düğüm) ve `border-router-client` (Uç düğümler) olmak üzere iki tip yazılım yüklenmiştir. RPL (Routing Protocol for Low-Power and Lossy Networks) bu yazılımların içinde çalışır.
 
-rwp_nodes30_speed0.5_pause2.dat
-rwp_nodes40_speed2.0_pause8.dat
+### 2.3. Eklentiler (Plugins)
+Simülasyonun yönetimi için kritik eklentiler aktiftir:
+- **Visualizer**: Ağı görsel olarak (ızgara, trafik, LED'ler) gösterir.
+- **ScriptRunner**: `cooja_analysis.js` dosyasını çalıştırarak verileri toplar.
+- **Mobility**: (Radyo ortamı içinde gizli olabilir veya harici bir plugin olarak) `.dat` dosyasındaki koordinatları periyodik olarak düğümlere uygular.
+
+---
+
+## 3. Kod Analizi (cooja_analysis.js)
+
+Bu JavaScript dosyası, Cooja'nın "Script Editor" eklentisi içinde çalışır. Simülasyondaki her log satırını yakalar (`msg` değişkeni) ve işler.
+
+### 3.1. Temel Yapı ve Sabitler
+```javascript
+TIMEOUT(4000000);             // Scriptin zaman aşımı (güvenlik için)
+var STOP_TIME = 3600000000;   // 60 Dakika (Mikrosaniye cinsinden)
+var PRINT_INTERVAL = 120000000; // 2 Dakikada bir rapor yazdır
+```
+Simülasyonun ne kadar süreceği ve ne sıklıkla rapor vereceği burada tanımlanır.
+
+### 3.2. Düğüm Veri Yapısı (`nodes` nesnesi)
+Her düğüm için istatistikler `nodes` objesinde tutulur:
+```javascript
+nodes[id] = { 
+  add: 0, list: 0, del_cnt: 0, ... // 6P (6top Protocol) Sayaçları
+  dio_tx: 0, dio_rx: 0, ...        // RPL Kontrol Mesajları
+  hello_tx: 0, hello_rx: 0         // PDR (Packet Delivery Ratio) için Hello mesajları
+};
+```
+
+### 3.3. Log Analiz Döngüsü
+Script sonsuz bir döngüde (`while(true)`) çalışır ve `YIELD()` komutu ile bir sonraki log satırını bekler.
+
+#### A. 6P (6TiSCH Operation Sublayer) Analizi
+6TiSCH ağlarında hücre (cell) rezervasyonu için kullanılan 6P protokolünün mesajlarını takip eder:
+```javascript
+if (msg.indexOf("Send ADD") >= 0) { s.add++; ... }
+else if (msg.indexOf("Send DELETE") >= 0) { s.del_cnt++; ... }
+```
+Bu sayede ağın ne kadar dinamik olduğu ve kaynak yönetiminin başarısı ölçülür.
+
+#### B. RPL (Routing Protocol) Analizi
+Yönlendirme protokolünün sağlığını ölçmek için kontrol mesajlarını sayar:
+- **DIO (DODAG Information Object)**: Ağ topolojisini kurmak için.
+- **DAO (Destination Advertisement Object)**: Yukarı yönlü rota bilgisi.
+- **DIS (DODAG Information Solicitation)**: Ağa katılmak isteyen düğümlerin çağrısı.
+
+#### C. Performans: PDR ve Gecikme (Latency)
+Ağın en önemli performans göstergeleridir.
+1.  **PDR (Packet Delivery Ratio)**: Gönderilen paketlerin ne kadarının hedefe ulaştığı.
+    - `Sending HELLO`: Düğüm paket gönderdiğinde artar (`hello_tx`).
+    - `Received HELLO`: Hedef düğüm paketi aldığında artar (`hello_rx`).
+    - **Formül**: `(Alınan Paket / Gönderilen Paket) * 100`
+
+2.  **Gecikme (Latency)**: Paketin kaynaktan hedefe varması için geçen süre.
+    - Log mesajında `latency=123 ms` gibi bir ifade aranır ve bu değerler toplanarak ortalaması alınır.
+
+### 3.4. Raporlama (`printStats` fonksiyonu)
+Belirlenen aralıklarda (`PRINT_INTERVAL`) konsola düzenli bir tablo yazdırır. Bu tablo şunları içerir:
+- Her düğüm için ayrı ayrı 6P işlem sayıları.
+- Toplam RPL kontrol mesaj trafiği.
+- Ağ genelindeki PDR yüzdesi ve ortalama gecikme süresi.
+
+---
+
+## 4. Veri Formatları (.dat)
+
+`mobility-traces/` klasöründeki dosyalar **BonnMotion** formatındadır. Her satır bir "hareket olayını" temsil eder.
+
+**Format:**
+```text
+<Düğüm ID> <Zaman> <X Koordinatı> <Y Koordinatı>
+```
+
+**Örnek:**
+```text
+0 0.0 10.5 20.3  -> 0 nolu düğüm, 0. saniyede (10.5, 20.3) konumundadır.
+1 2.5 15.0 22.1  -> 1 nolu düğüm, 2.5. saniyede (15.0, 22.1) konumuna varır.
+```
+Simülatör bu dosyayı okur ve iki zaman damgası arasındaki hareketi "enterpolasyon" ile tamamlar. Yani düğüm 0. saniyeden 2.5. saniyeye kadar o iki nokta arasında düz bir çizgide kayarak ilerler.
+
+---
+
+## 5. Nasıl Çalıştırılır?
+
+1.  **Cooja'yı Başlatın**: Terminalden `ant cooja` komutu ile (Contiki dizininde).
+2.  **Senaryoyu Yükleyin**: `File > Open simulation > experiments/mobil_network30node.csc`.
+3.  **İz Dosyasını Kontrol Edin**: Cooja'da "Mobility" eklentisine gidin (genellikle eklentiler menüsünde veya mote özelliklerinde bulunur). `mobility-traces/` altındaki `.dat` dosyasının seçili olduğundan emin olun.
+4.  **Script'i Aktif Edin**: "Simulation Script Editor" penceresinin açık olduğundan ve kodun yüklü olduğundan emin olun.
+5.  **Başlat (Start)**: Simülasyonu başlatın. Script penceresinde "Log Output" kısmında istatistiklerin aktığını göreceksiniz.
+
+---
+*Bu dokümantasyon, projenin şeffaflığını ve bilimsel tekrarlanabilirliğini sağlamak amacıyla detaylandırılmıştır.*
