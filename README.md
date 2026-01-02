@@ -110,6 +110,7 @@ Unlike standard simulations where nodes are generically indexed (0 to N-1), our 
 ```bash
 ./bin/generate_cooja_trace.sh -o positions.dat --config test_config.txt -- -d 100 -x 100 -y 100
 ```
+Figure 2: Execution of the custom trace generation workflow. The screenshot demonstrates the validation of the configuration file (test_config.txt), which defines the specific target nodes and their static coordinates. Subsequently, the wrapper script (generate_cooja_trace.sh) is executed to invoke BonnMotion. Unlike the standard utilization, this script parses the configuration to automatically determine the node count and performs an ID remapping process, assigning the generated Random Waypoint trajectories to the designated Cooja node IDs (e.g., Node 1, 3, 5) ensuring precise mobility control within the simulation.
 
 <img width="1448" height="957" alt="image" src="https://github.com/user-attachments/assets/5b93ece3-76a0-4b19-a955-01d99e1db403" />
-
+Figure 2. Execution of the custom trace generation workflow.
