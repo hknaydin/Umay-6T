@@ -9,8 +9,8 @@ Umay-6T introduces "Soft State" management to 6TiSCH.
 
 - **Cell Retention (CRM):** Caches cells ($T_{cache}$) upon disconnection.
 - **Fast Reconnection (FRM):** Reactivates cells upon reappearance.
-- **Consistency Verification:** **[NEW]** Verifies the neighbor's state (via `6P COUNT`) to prevent "Zombie Cells" if the neighbor rebooted.
-- **RPL Synchronization:** **[NEW]** Triggers the IP routing layer to recognize the restored link immediately.
+- **Consistency Verification:** Verifies the neighbor's state (via `6P COUNT`) to prevent "Zombie Cells" if the neighbor rebooted.
+- **RPL Synchronization:** Triggers the IP routing layer to recognize the restored link immediately.
 
 ## 2. Configuration Parameters
 
