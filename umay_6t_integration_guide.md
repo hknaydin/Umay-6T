@@ -17,17 +17,22 @@ Umay-6T introduces "Soft State" management to 6TiSCH.
 Add these to `project-conf.h`:
 
 ```c
+/* Umay-6T Protocol Switch */
 #define UMAY_6T_ENABLED 1
-#define UMAY_DEFAULT_CACHE_DURATION 60 
 
-/* Advanced Features */
-#define UMAY_CONSISTENCY_CHECK_ENABLED 1
-#define UMAY_RPL_SYNC_ENABLED 1
+/* Parameters from Eq. (2) in Article */
+#define UMAY_DEFAULT_CACHE_DURATION 60 
+#define UMAY_ALPHA 10
+#define UMAY_BETA 5
+
+/* Advanced Robustness Switches */
+#define UMAY_CONSISTENCY_CHECK_ENABLED 1 /* Prevents "Zombie" cells */
+#define UMAY_RPL_SYNC_ENABLED 1          /* Cross-layer optimization */
 
 /* Cell States */
 #define CELL_STATE_ACTIVE 0
 #define CELL_STATE_CACHED 1
-#define CELL_STATE_VALIDATING 2 /* Temporary state during Consistency Check */
+#define CELL_STATE_VALIDATING 2 /* Wait for 6P COUNT Response */
 ```
 
 ## 3. Detailed Implementation Steps
