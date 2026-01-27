@@ -53,8 +53,25 @@ typedef struct cell {
 Step 2: Implement Robust Core Logic (`nbr-cell-table.c`)
 
 #### A. Soft Delete (Standard)
-(See previous guide - marks cells as `CACHED`).
 
+Modify nbr_cell_table_delete_nbr. Instead of freeing memory, we cache it.
+```c
+void reactivate_cached_cells(nbr_cell_table_t *n) {
+    cell_t *c;
+    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)) {
+        if(c->state == CELL_STATE_VALIDATING || c->state == CELL_STATE_CACHED) {
+             /* Check Conflicts */
+             if(!is_cell_conflicting(c->slot_offset)) {
+                 c->state = CELL_STATE_ACTIVE;
+                 c->expiry_time = 0;
+             } else {
+                 /* Remove conflicted cell */
+                 // remove logic...
+             }
+        }
+    }
+}
+```
 #### B. Robust Fast Reconnection (Validation Logic)
 Replace the simple add logic with this robust state machine.
 
@@ -100,6 +117,25 @@ static nbr_cell_table_t * nbr_cell_table_add_nbr(linkaddr_t *linkaddr) {
 Add this helper function to sync the IP layer.
 
 ```c
+
+/* Helper to reactivate cells after checks */
+void umay_reactivate_cells(nbr_cell_table_t *n) {
+    cell_t *c;
+    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)) {
+        if((c->state == CELL_STATE_CACHED || c->state == CELL_STATE_VALIDATING) &&
+           !is_cell_conflicting(c->slot_offset)) {
+            
+            c->state = CELL_STATE_ACTIVE;
+            c->expiry_time = 0;
+            LOG_INFO("UMAY-6T: Cell %u reactivated.\n", c->slot_offset);
+        }
+    }
+    /* Cross-Layer: Inform RPL */
+    #if UMAY_RPL_SYNC_ENABLED
+    umay_sync_rpl(&n->linkaddr);
+    #endif
+}
+
 void umay_sync_rpl(linkaddr_t *lladdr) {
 #if UMAY_RPL_SYNC_ENABLED
     uip_ipaddr_t ipaddr;
@@ -172,5 +208,22 @@ void reactivate_cached_cells(nbr_cell_table_t *n) {
              }
         }
     }
+}
+```
+Step 5: Scheduler Logic (4emac-6top-scheduler-minimal.c)
+
+Ensure the scheduler respects the cell states.
+
+```c
+/* In sixtop_slot_callback */
+ret_val = foure_mac_buf_content_get_scheduled(...);
+/* 1. If CACHED or VALIDATING, Treat as Unscheduled */
+if(buf_item.sl != NULL && buf_item.sl->state != CELL_STATE_ACTIVE) {
+    /* Do not transmit on cached/validating cells */
+    ret_val = FOURE_SLOT_UNSCHEDULED;
+}
+/* 2. If ACTIVE (Reactivated by FRM), Proceed Normally */
+if(ret_val != FOURE_SLOT_UNSCHEDULED) {
+    /* Standard Transmission Logic */
 }
 ```
