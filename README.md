@@ -2,7 +2,7 @@
 
 This repository provides the mobility trace (`.dat`) files used in the experimental evaluation of our paper.
 
-The goal of sharing these traces is to ensure reproducibility: the same node movements can be replayed by other researchers under identical simulation settings.
+<p align="justify"> The goal of sharing these traces is to ensure reproducibility: the same node movements can be replayed by other researchers under identical simulation settings. </p>
 
 ---
 
@@ -11,11 +11,11 @@ The goal of sharing these traces is to ensure reproducibility: the same node mov
 - Trace generator: **BonnMotion**
 - Mobility model: **Random Waypoint (RWP)**
 
-The traces were generated offline and exported as position files. Each file contains time-indexed (x,y) coordinates for each mobile node.
+<div align="justify"> The traces were generated offline and exported as position files. Each file contains time-indexed (x,y) coordinates for each mobile node.</p>
 
 ### Visualization
 
-The following visualization illustrates the random waypoint mobility pattern. Nodes (represented by indices) move towards random destinations within the 100x100m simulation area. The lines represent the trajectories of individual nodes over the simulation duration.
+<div align="justify"> The following visualization illustrates the random waypoint mobility pattern. Nodes (represented by indices) move towards random destinations within the 100x100m simulation area. The lines represent the trajectories of individual nodes over the simulation duration.</p>
 
 <img width="1448" height="957" alt="image" src="https://github.com/user-attachments/assets/5b93ece3-76a0-4b19-a955-01d99e1db403" />
 
