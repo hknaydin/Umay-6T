@@ -232,3 +232,60 @@ if(ret_val != FOURE_SLOT_UNSCHEDULED) {
     /* Standard Transmission Logic */
 }
 ```
+
+Step 6: Cache Maintenance & Fallback (Garbage Collection)
+
+To comply with the fail-safe mechanism detailed in Algorithm 3 of the Umay-6T manuscript, we must implement a periodic routine to permanently delete soft-state cells if a neighbor fails to return before $T_{cache}$ expires.
+
+**Action:** Create a `ctimer` that ticks every slotframe or every few seconds to execute this cleanup routine.
+
+```c
+void umay_cache_maintenance_routine(void) {
+    nbr_cell_table_t *n;
+    cell_t *c, *next_c;
+    unsigned long current_time = clock_seconds();
+
+    for(n = NBR_HEAD(); n != NULL; NBR_NEXT(n)) {
+        if(!has_cached_cells(n)) continue;
+
+        c = CELL_HEAD(n);
+        while(c != NULL) {
+            next_c = list_item_next(c);
+            
+            /* If cell is cached and expired */
+            if(c->state == CELL_STATE_CACHED && current_time >= c->expiry_time) {
+                LOG_WARN("UMAY-6T: Cache expired for cell offset %u. Hard deleting.\n", c->slot_offset);
+                /* Remove from slotframe schedule */
+                list_remove(n->slot_frame_list, c);
+                memb_free(&slot_frame_mem, c);
+            }
+            c = next_c;
+        }
+
+        /* If no cells remain for this neighbor, fallback to baseline 6TiSCH deletion */
+        if(!has_active_or_cached_cells(n)) {
+            LOG_INFO("UMAY-6T: All cached cells expired. Removing neighbor state.\n");
+            list_remove(nbr_cell_table_list, n);
+            memb_free(&nbr_cell_table_mem, n);
+        }
+    }
+}
+```
+
+## 4. Reproducibility & Open Science
+
+To address reviewer concerns regarding reproduction and empirical validation, Umay-6T provides full transparency on its build parameters.
+
+### Code Availability
+The full source code of the modified Contiki-NG 4emac MAC layer, custom 6P scheduler, and the simulation configuration files (.csc) are publicly available on GitHub to ensure complete reproducibility of the manuscript's findings.
+* **Repository Link:** [Insert GitHub Link Here, e.g., github.com/mavialp/Umay-6T]
+
+### Cooja Simulation Setup
+To reproduce the numerical results presented in the paper (e.g., 17% reduction in control overhead), simulators must use the following configuration parameters:
+- **Mobility Model:** BonnMotion Random Waypoint implementation loaded dynamically into Cooja.
+- **Node Type:** Cooja Mote (with 1 MB RAM limit simulated)
+- **Compile Flags:** Ensure `UMAY_6T_ENABLED=1`, `UMAY_CONSISTENCY_CHECK_ENABLED=1`, and `UMAY_RPL_SYNC_ENABLED=1` are defined in your `project-conf.h`.
+- **Make Target:** Compile using the standard `make TARGET=cooja` within your simulation directory.
+
+### Testbed Deployment (Future Work)
+When transitioning from Cooja to industrial testbeds (e.g., Umote / Mahmote) as discussed in the paper, ensure that hardware timers appropriately reflect the `clock_seconds()` precision required by the Cache Maintenance routine.
