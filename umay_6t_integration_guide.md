@@ -22,8 +22,8 @@ Add these to `project-conf.h`:
 
 /* Parameters from Eq. (2) in Article */
 #define UMAY_DEFAULT_CACHE_DURATION 60 
-#define UMAY_ALPHA 10
-#define UMAY_BETA 5
+#define UMAY_ALPHA 1.2
+#define UMAY_BETA 0.5
 
 /* Advanced Robustness Switches */
 #define UMAY_CONSISTENCY_CHECK_ENABLED 1 /* Prevents "Zombie" cells */
