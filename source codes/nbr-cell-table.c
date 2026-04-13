@@ -135,11 +135,7 @@ nbr_cell_table_set_nbr_seqnum_management(linkaddr_t *linkaddr, uint8_t seqnum)
 {
   nbr_cell_table_t *n = nbr_cell_table_get_nbr(linkaddr);
 
-  if(n != NULL){
-    n->seqnum = seqnum;
-    return seqnum;
-  }
-
+  /* [Mavi Alp Research Proprietary Code Redacted] */
   return 0xFF;
 }
 /*------------------------------------------------------------------------------*/
@@ -148,11 +144,7 @@ nbr_cell_table_inc_nbr_seqnum_management(linkaddr_t *linkaddr)
 {
   nbr_cell_table_t *n = nbr_cell_table_get_nbr(linkaddr);
 
-  if(n != NULL){
-    LOLLIPOP_COUNTER_INC(n->seqnum);
-    return n->seqnum;
-  }
-
+  /* [Mavi Alp Research Proprietary Code Redacted] */
   return 0xFF;
 }
 
@@ -170,12 +162,8 @@ nbr_cell_table_get_nbr(linkaddr_t *linkaddr)
 {
   nbr_cell_table_t *n;
 
-  if(linkaddr != NULL){
-    for(n = NBR_HEAD(); n != NULL; NBR_NEXT(n)){
-      if(memcmp(&n->linkaddr, linkaddr, sizeof(linkaddr_t)) == 0)
-        return  n;
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return NULL;
 }
 /*------------------------------------------------------------------------------*/
@@ -185,14 +173,8 @@ nbr_cell_table_get_nbr_from_ipaddr(uip_ipaddr_t *ipaddr)
   nbr_cell_table_t *n;
   linkaddr_t linkaddr;
 
-  if(ipaddr != NULL){
-    nbr_set_lladdr_from_ipaddr(&linkaddr, ipaddr);
+  /* [Mavi Alp Research Proprietary Code Redacted] */
 
-    for(n = NBR_HEAD(); n != NULL; NBR_NEXT(n)){
-      if(memcmp(&n->linkaddr, &linkaddr, sizeof(linkaddr_t)) == 0)
-        return  n;
-    }
-  }
   return NULL;
 }
 /*------------------------------------------------------------------------------*/
@@ -202,14 +184,8 @@ nbr_cell_table_get_linkaddr_from_ipaddr(uip_ipaddr_t *ipaddr)
   nbr_cell_table_t *n;
   linkaddr_t linkaddr;
 
-  if(ipaddr != NULL){
-    nbr_set_lladdr_from_ipaddr(&linkaddr, ipaddr);
+  /* [Mavi Alp Research Proprietary Code Redacted] */
 
-    for(n = NBR_HEAD(); n != NULL; NBR_NEXT(n)){
-      if(memcmp(&n->linkaddr, &linkaddr, sizeof(linkaddr_t)) == 0)
-        return  &n->linkaddr;
-    }
-  }
   return NULL;
 }
 /*------------------------------------------------------------------------------*/
@@ -264,9 +240,7 @@ nbr_cell_table_add_nbr(linkaddr_t *linkaddr)
 void
 nbr_cell_table_add_nbr_callback(linkaddr_t *linkaddr)
 {
-  if(linkaddr != NULL && memcmp(linkaddr, &linkaddr_null, sizeof(linkaddr_t)) != 0){
-    nbr_cell_table_add_nbr(linkaddr);
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
 }
 /*------------------------------------------------------------------------------*/
 void
@@ -274,30 +248,15 @@ nbr_cell_table_delete_nbr(linkaddr_t *linkaddr)
 {
   nbr_cell_table_t *n = nbr_cell_table_get_nbr(linkaddr);
 
-  if(n != NULL){
-    LOG_INFO("0x%02x%02x was deleted\n", n->linkaddr.u8[6], n->linkaddr.u8[7]);
-#if UMAY_6T_ENABLED
-    /* Soft Delete: Cache Instead of Hard Delete */
-    cell_t *c;
-    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)) {
-        c->state = CELL_STATE_CACHED;
-        c->expiry_time = clock_seconds() + UMAY_DEFAULT_CACHE_DURATION; 
-    }
-    LOG_INFO("UMAY-6T: Cached %u cells for fast reconnection.\n", CELL_COUNT(n));
-#else
-    nbr_cell_table_del_all_nbr_cells(linkaddr, (CELL_TYPE_NEIGHBOR | CELL_TYPE_TRACK_ALL | CELL_TYPE_ALL));
-    list_remove(nbr_cell_table_list, n);
-    memb_free(&nbr_cell_table_mem, n);
-#endif
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
 }
 /*------------------------------------------------------------------------------*/
 void
 nbr_cell_table_delete_nbr_callback(linkaddr_t *linkaddr)
 {
-  if(linkaddr != NULL && memcmp(linkaddr, &linkaddr_null, sizeof(linkaddr_t)) != 0){
-    nbr_cell_table_delete_nbr(linkaddr);
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
 }
 /*------------------------------------------------------------------------------*/
 uint8_t
@@ -309,11 +268,8 @@ nbr_cell_table_nbr_num()
 void
 nbr_cell_table_set_preferred_parent(nbr_cell_table_t *n)
 {
-  if(n != NULL){
-    /* we put it at the start of the nbr_cell_table_list list. */
-    list_remove(nbr_cell_table_list, n);
-    list_push(nbr_cell_table_list, n);
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
 }
 
 /*------------------------------------------------------------- NEIGHBOUR CELLS -------------------------------------------------------------*/
@@ -324,14 +280,8 @@ nbr_cell_table_get_nbr_cell(nbr_cell_table_t *n, sixp_cell_t *cell_list)
 {
   cell_t *c;
 
-  if(n != NULL){
-    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)){
-      if(c->slot_offset == cell_list->slot_offset &&
-         c->channel_offset == cell_list->channel_offset){
-        return c;
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return NULL;
 }
 /*------------------------------------------------------------------------------*/
@@ -341,14 +291,8 @@ nbr_cell_table_get_nbr_slot(linkaddr_t *linkaddr, uint16_t slot_offset)
   cell_t *c;
   nbr_cell_table_t *n;
 
-  n = nbr_cell_table_get_nbr(linkaddr);
-  if(n != NULL){
-    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)){
-      if(c->slot_offset == slot_offset){
-        return c;
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return NULL;
 }
 /*------------------------------------------------------------------------------*/
@@ -358,14 +302,8 @@ nbr_cell_table_get_nbr_min_offset_slot(linkaddr_t *linkaddr, uint8_t cell_type)
   nbr_cell_table_t *n;
   cell_t *c ,*cell_min = NULL;
 
-  n = nbr_cell_table_get_nbr(linkaddr);
-  if(n != NULL){
-    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)){
-      if((c->type & cell_type) && (cell_min == NULL || cell_min->slot_offset > c->slot_offset)){
-        cell_min = c;
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return cell_min;
 }
 /*------------------------------------------------------------------------------*/
@@ -375,14 +313,8 @@ nbr_cell_table_get_nbr_max_offset_slot(linkaddr_t *linkaddr, uint8_t cell_type)
   nbr_cell_table_t *n;
   cell_t *c ,*cell_max = NULL;
 
-  n = nbr_cell_table_get_nbr(linkaddr);
-  if(n != NULL){
-    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)){
-      if((c->type & cell_type) && (cell_max == NULL || cell_max->slot_offset < c->slot_offset)){
-        cell_max = c;
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return cell_max;
 }
 /*------------------------------------------------------------------------------*/
@@ -393,20 +325,8 @@ nbr_cell_table_get_nbr_cells(linkaddr_t *linkaddr, uint8_t cell_type, sixp_cell_
   cell_t *c;
   nbr_cell_table_t *n;
 
-  n = nbr_cell_table_get_nbr(linkaddr);
-  if(n != NULL){
-    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)){
-      if((c->type & cell_type)/* && (c->lock & cell_lock)*/){
-        if(cell_num < SIXP_MAX_CELLS){
-          cell_list[cell_num].slot_offset = c->slot_offset;
-          cell_list[cell_num].channel_offset = c->channel_offset;
-          cell_num++;
-        }else{
-          LOG_DBG("Cell %u-%u Overflow\n", c->slot_offset, c->channel_offset);
-        }
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return cell_num;
 }
 /*------------------------------------------------------------------------------*/
@@ -417,14 +337,8 @@ nbr_cell_table_get_nbr_cell_num(linkaddr_t *linkaddr, uint8_t cell_type)
   cell_t *c;
   nbr_cell_table_t *n;
 
-  n = nbr_cell_table_get_nbr(linkaddr);
-  if(n != NULL){
-    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)){
-      if((c->type & cell_type)/* && (c->lock & cell_lock)*/){
-        cell_num++;
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return cell_num;
 }
 /*------------------------------------------------------------------------------*/
@@ -435,31 +349,8 @@ nbr_cell_table_add_nbr_cells(linkaddr_t *linkaddr, sixp_cell_t *cell_list, uint8
   cell_t *c;
   nbr_cell_table_t *n = nbr_cell_table_get_nbr(linkaddr);
 
-  if(n != NULL){
-    for(i = 0; i < cell_num; i++){
-      c = nbr_cell_table_get_nbr_slot(linkaddr, cell_list[i].slot_offset);
-      if(c == NULL){
-        c = memb_alloc(&slot_frame_mem);
-        if(c == NULL){
-          LOG_WARN("Cell memory allocation failed!\n");
-          FOURE_LOG(LOG_LEVEL_2, CORE_NET_MAC, EC_4EMAC_CELL_MEMORY_ALLOC_FAILED);
-          return cellnum;
-        }
-        c->slot_offset = cell_list[i].slot_offset;
-        c->channel_offset = cell_list[i].channel_offset;
-        c->type = cell_type;
-        //c->lock = cell_lock;
-        list_add(n->slot_frame_list, c);
-      }else{
-        LOG_DBG("Existing cell %u-%u t%u ", c->slot_offset, c->channel_offset, c->type);
-        c->channel_offset = cell_list[i].channel_offset;
-        c->type = cell_type;
-        //c->lock = cell_lock;
-      }
-      LOG_DBG("Cell %u-%u added for 0x%02x%02x\n", c->slot_offset, c->channel_offset, linkaddr->u8[6], linkaddr->u8[7]);
-      cellnum++;
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return cellnum;
 }
 /*------------------------------------------------------------------------------*/
@@ -470,17 +361,8 @@ nbr_cell_table_del_nbr_cells(linkaddr_t *linkaddr, sixp_cell_t *cell_list, uint8
   cell_t *c;
   nbr_cell_table_t *n = nbr_cell_table_get_nbr(linkaddr);
 
-  if(n != NULL){
-    for(i = 0; i < cell_num; i++){
-      c = nbr_cell_table_get_nbr_cell(n, &cell_list[i]);
-      if(c != NULL){
-        LOG_DBG("Cell %u-%u deleted for 0x%02x%02x\n", c->slot_offset, c->channel_offset, linkaddr->u8[6], linkaddr->u8[7]);
-        list_remove(n->slot_frame_list, c);
-        memb_free(&slot_frame_mem, c);
-        cellnum++;
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return cellnum;
 }
 /*------------------------------------------------------------------------------*/
@@ -491,20 +373,8 @@ nbr_cell_table_del_all_nbr_cells(linkaddr_t *linkaddr, uint8_t cell_type)
   cell_t *c, *temp_c;
   nbr_cell_table_t *n = nbr_cell_table_get_nbr(linkaddr);
 
-  if(n != NULL){
-    c = CELL_HEAD(n);
-    while(c != NULL){
-      if((c->type & cell_type)/* && (c->lock & cell_lock)*/){
-        LOG_DBG("Cell %u-%u deleted for 0x%02x%02x\n", c->slot_offset, c->channel_offset, linkaddr->u8[6], linkaddr->u8[7]);
-        temp_c = c;
-        CELL_NEXT(c);
-        list_remove(n->slot_frame_list, temp_c);
-        memb_free(&slot_frame_mem, temp_c);
-        cellnum++;
-      }else
-        CELL_NEXT(c);
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return cellnum;
 }
 /*------------------------------------------------------------------------------*/
@@ -515,15 +385,8 @@ nbr_cell_table_is_cell_scheduled_for_any_nbr(uint16_t slot_offset, uint16_t chan
   nbr_cell_table_t *n;
   sixp_cell_t cell = {slot_offset, channel_offset};
 
-  for(n = NBR_HEAD(); n != NULL; NBR_NEXT(n)){
-    if(ignored_linkaddr == NULL || memcmp(&n->linkaddr, ignored_linkaddr, sizeof(linkaddr_t)) != 0){
-      c = nbr_cell_table_get_nbr_cell(n, &cell);
-      if(c != NULL){
-        LOG_INFO("Cell %u-%u is used by 0x%02x%02x\n", c->slot_offset, c->channel_offset, n->linkaddr.u8[6], n->linkaddr.u8[7]);
-        return 1;
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return 0;
 }
 /*------------------------------------------------------------------------------*/
@@ -533,16 +396,8 @@ nbr_cell_table_is_slot_scheduled_for_any_nbr(uint16_t slot_offset, linkaddr_t *i
   cell_t *c;
   nbr_cell_table_t *n;
 
-  for(n = NBR_HEAD(); n != NULL; NBR_NEXT(n)){
-    if(ignored_linkaddr == NULL || memcmp(&n->linkaddr, ignored_linkaddr, sizeof(linkaddr_t)) != 0){
-      for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)){
-        if(c->slot_offset == slot_offset){
-          LOG_INFO("Cell %u-%u is used by 0x%02x%02x\n", c->slot_offset, c->channel_offset, n->linkaddr.u8[6], n->linkaddr.u8[7]);
-          return 1;
-        }
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return 0;
 }
 /*------------------------------------------------------------- NODE CELLS -------------------------------------------------------------*/
@@ -553,23 +408,7 @@ nbr_cell_table_get_slot(linkaddr_t *linkaddr, uint16_t slot_offset)
 {
   destination_t *dn;
   slot_t *sl;
-
-  if(linkaddr != NULL){
-    dn = foure_mac_buf_destination_get(linkaddr);
-    for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-      if(sl->slot_offset == slot_offset){
-        return sl;
-      }
-    }
-  }else{ /* cells for all neighbor */
-    for(dn = foure_mac_buf_destination_get_head(); dn != NULL; dn = list_item_next(dn)){
-      for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-        if(sl->slot_offset == slot_offset){
-          return sl;
-        }
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
 
   return NULL;
 }
@@ -580,23 +419,7 @@ nbr_cell_table_get_min_offset_slot(linkaddr_t *linkaddr, uint8_t cell_type)
   destination_t *dn;
   slot_t *sl, *slot_min = NULL;
 
-  if(linkaddr != NULL){
-    dn = foure_mac_buf_destination_get(linkaddr);
-    for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-      if((sl->type & cell_type) && (slot_min == NULL || slot_min->slot_offset > sl->slot_offset)){
-        slot_min = sl;
-      }
-    }
-  }else{ /* cells for all neighbor */
-    for(dn = foure_mac_buf_destination_get_head(); dn != NULL; dn = list_item_next(dn)){
-      for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-        if((sl->type & cell_type) && (slot_min == NULL || slot_min->slot_offset > sl->slot_offset)){
-          slot_min = sl;
-        }
-      }
-    }
-  }
-
+  /* [Mavi Alp Research Proprietary Code Redacted] */
   return slot_min;
 }
 /*------------------------------------------------------------------------------*/
@@ -606,23 +429,7 @@ nbr_cell_table_get_max_offset_slot(linkaddr_t *linkaddr, uint8_t cell_type)
   destination_t *dn;
   slot_t *sl, *slot_max = NULL;
 
-  if(linkaddr != NULL){
-    dn = foure_mac_buf_destination_get(linkaddr);
-    for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-      if((sl->type & cell_type) && (slot_max == NULL || slot_max->slot_offset < sl->slot_offset)){
-        slot_max = sl;
-      }
-    }
-  }else{ /* cells for all neighbor */
-    for(dn = foure_mac_buf_destination_get_head(); dn != NULL; dn = list_item_next(dn)){
-      for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-        if((sl->type & cell_type) && (slot_max == NULL || slot_max->slot_offset < sl->slot_offset)){
-          slot_max = sl;
-        }
-      }
-    }
-  }
-
+  /* [Mavi Alp Research Proprietary Code Redacted] */
   return slot_max;
 }
 /*------------------------------------------------------------------------------*/
@@ -633,44 +440,7 @@ nbr_cell_table_get_cells(linkaddr_t *linkaddr, uint8_t cell_type, uint8_t cell_l
   slot_t *sl;
   uint8_t cell_num = 0;
 
-  if(linkaddr != NULL){
-    dn = foure_mac_buf_destination_get(linkaddr);
-    for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-      if((sl->type & cell_type) && (sl->lock & cell_lock) && sl->slot_offset >= cell_offset){
-#if TRACKING_ENABLED
-        if(sl->t == NULL)
-#endif
-        {
-          if(cell_num < cell_list_len){
-            cell_list[cell_num].slot_offset = sl->slot_offset;
-            cell_list[cell_num].channel_offset = sl->channel_offset;
-            cell_num++;
-          }else{
-            LOG_DBG("Cell %u-%u Overflow\n", sl->slot_offset, sl->channel_offset);
-          }
-        }
-      }
-    }
-  }else{ /* cells for all neighbor */
-    for(dn = foure_mac_buf_destination_get_head(); dn != NULL; dn = list_item_next(dn)){
-      for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-        if((sl->type & cell_type) && (sl->lock & cell_lock) && sl->slot_offset >= cell_offset){
-#if TRACKING_ENABLED
-          if(sl->t == NULL)
-#endif
-          {
-            if(cell_num < cell_list_len){
-              cell_list[cell_num].slot_offset = sl->slot_offset;
-              cell_list[cell_num].channel_offset = sl->channel_offset;
-              cell_num++;
-            }else{
-              LOG_DBG("Cell %u-%u Overflow\n", sl->slot_offset, sl->channel_offset);
-            }
-          }
-        }
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
 
   return cell_num;
 }
@@ -682,32 +452,7 @@ nbr_cell_table_get_cell_num(linkaddr_t *linkaddr, uint8_t cell_type, uint8_t cel
   slot_t *sl;
   uint8_t cell_num = 0;
 
-  if(linkaddr != NULL){
-    dn = foure_mac_buf_destination_get(linkaddr);
-    for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-      if((sl->type & cell_type) && (sl->lock & cell_lock) && sl->slot_offset >= cell_offset){
-#if TRACKING_ENABLED
-        if(sl->t == NULL)
-#endif
-        {
-          cell_num++;
-        }
-      }
-    }
-  }else{ /* cells for all neighbor */
-    for(dn = foure_mac_buf_destination_get_head(); dn != NULL; dn = list_item_next(dn)){
-      for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-        if((sl->type & cell_type) && (sl->lock & cell_lock) && sl->slot_offset >= cell_offset){
-#if TRACKING_ENABLED
-          if(sl->t == NULL)
-#endif
-          {
-            cell_num++;
-          }
-        }
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
 
   return cell_num;
 }
@@ -717,13 +462,7 @@ nbr_cell_table_schedule_cells(linkaddr_t *linkaddr, sixp_cell_t *cell_list, uint
 {
   uint8_t i, ret, cellnum = 0;
 
-  for(i = 0; i < cell_num; i++){
-    ret = foure_mac_buf_slot_schedule(linkaddr, cell_type, cell_lock, cell_list[i].slot_offset, cell_list[i].channel_offset, life_time);
-    if(ret & (FOURE_RET_OK | FOURE_RET_UPDATE)){
-      LOG_DBG("Cell %u-%u scheduled for 0x%02x%02x\n", cell_list[i].slot_offset, cell_list[i].channel_offset, linkaddr->u8[6], linkaddr->u8[7]);
-      cellnum++;
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
 
   return cellnum;
 }
@@ -733,11 +472,7 @@ nbr_cell_table_unschedule_cells(linkaddr_t *linkaddr, sixp_cell_t *cell_list, ui
 {
   uint8_t i, cellnum = 0;
 
-  for(i = 0; i < cell_num; i++){
-    foure_mac_buf_slot_unschedule(linkaddr, cell_list[i].slot_offset);
-    LOG_DBG("Cell %u-%u unscheduled for 0x%02x%02x\n", cell_list[i].slot_offset, cell_list[i].channel_offset, linkaddr->u8[6], linkaddr->u8[7]);
-    cellnum++;
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
 
   return cellnum;
 }
@@ -748,14 +483,8 @@ nbr_cell_table_lock_cells(linkaddr_t *linkaddr, sixp_cell_t *cell_list, uint8_t 
   slot_t *sl;
   uint8_t i;
 
-  for(i = 0; i < cell_num; i++){
-    sl = nbr_cell_table_get_slot(linkaddr, cell_list[i].slot_offset);
-    if(sl != NULL){
-      sl->lock = cell_lock;
-      LOG_DBG("Cell %u-%u was %s\n", cell_list[i].slot_offset, cell_list[i].channel_offset,
-                                           (cell_lock == CELL_LOCK) ? "locked" : ((cell_lock == CELL_UNLOCK) ? "unlocked" : "reserved"));
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
 }
 /*------------------------------------------------------------------------------*/
 uint8_t
@@ -765,20 +494,7 @@ nbr_cell_table_lock_all(linkaddr_t *linkaddr, uint8_t cell_type, uint8_t cell_lo
   slot_t *sl;
   uint8_t cell_num = 0;
 
-  dn = foure_mac_buf_destination_get(linkaddr);
-  for(sl = foure_mac_buf_slot_head(dn); sl != NULL; sl = list_item_next(sl)){
-    if((sl->type & cell_type)){
-#if TRACKING_ENABLED
-      if(sl->t == NULL)
-#endif
-      {
-        sl->lock = cell_lock;
-        LOG_DBG("Cell %u-%u was %s\n", sl->slot_offset, sl->channel_offset,
-                                             (cell_lock == CELL_LOCK) ? "locked" : ((cell_lock == CELL_UNLOCK) ? "unlocked" : "reserved"));
-        cell_num++;
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
   return cell_num;
 }
 /*------------------------------------------------------------------------------*/
@@ -787,13 +503,7 @@ nbr_cell_table_cell_lifetime_expired(linkaddr_t *linkaddr, uint8_t slot_offset)
 {
   slot_t *sl;
 
-  sl = nbr_cell_table_get_slot(linkaddr, slot_offset);
-  if(sl != NULL){
-    if(sl->lifetime.interval != FOURE_SLOT_INFINITE_LIFETIME &&
-       stimer_expired(&sl->lifetime)){
-      return 1;
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
   return 0;
 }
 /*------------------------------------------------------------------------------*/
@@ -804,37 +514,8 @@ nbr_cell_table_get_diff_cells(linkaddr_t *linkaddr, uint8_t cell_type, uint8_t c
   uint8_t cellnum;
   sixp_cell_t celllist[FOURE_MAX_SLOTS_PER_DESTINATION];
 
-  cellnum = nbr_cell_table_get_cells(linkaddr, cell_type, cell_lock, 0, celllist, FOURE_MAX_SLOTS_PER_DESTINATION);
-  if(cell_num >= cellnum){
-    for(i = 0; i < cell_num; i++){
-      for(j = 0; j < cellnum; j++){
-        if(celllist[j].slot_offset == cell_list[i].slot_offset &&
-           celllist[j].channel_offset == cell_list[i].channel_offset){
-          break;
-        }
-      }
-      if(j == cellnum){
-        cell_list[num_cell].slot_offset = cell_list[i].slot_offset;
-        cell_list[num_cell].channel_offset = cell_list[i].channel_offset;
-        num_cell++;
-      }
-    }
-  }else{
-    for(i = 0; i < cellnum; i++){
-      for(j = 0; j < cell_num; j++){
-        if(cell_list[j].slot_offset == celllist[i].slot_offset &&
-           cell_list[j].channel_offset == celllist[i].channel_offset){
-          break;
-        }
-      }
-      if(j == cell_num){
-        celllist[num_cell].slot_offset = celllist[i].slot_offset;
-        celllist[num_cell].channel_offset = celllist[i].channel_offset;
-        num_cell++;
-      }
-    }
-    memcpy(cell_list, celllist, num_cell * sizeof(sixp_cell_t));
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
   return num_cell;
 }
 /*------------------------------------------------------------------------------*/
@@ -844,15 +525,8 @@ nbr_cell_table_sort_cells(sixp_cell_t *cell_list, uint8_t cell_num)
   sixp_cell_t cell;
   uint8_t i, j;
 
-  for(i = 0; i < cell_num - 1; i++){
-    for(j = 0; j < cell_num - i - 1; j++){
-      if(cell_list[j].slot_offset > cell_list[j + 1].slot_offset){
-        memcpy(&cell, &cell_list[j], sizeof(sixp_cell_t));
-        memcpy(&cell_list[j], &cell_list[j + 1], sizeof(sixp_cell_t));
-        memcpy(&cell_list[j + 1], &cell, sizeof(sixp_cell_t));
-      }
-    }
-  }
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
 }
 /*------------------------------------------------------------------------------------------------------------------------------------------------------------
  *  set ipaddr from given linkaddr and prefix
@@ -872,16 +546,8 @@ nbr_set_lladdr_from_ipaddr(linkaddr_t *linkaddr, uip_ipaddr_t *ipaddr)
 {
   /* We consider only links with IEEE EUI-64 identifier or
    * IEEE 48-bit MAC addresses */
-#if (UIP_LLADDR_LEN == 8)
-  memcpy(linkaddr, ipaddr->u8 + 8, UIP_LLADDR_LEN);
-  linkaddr->u8[0] ^= 0x02;
-#elif (UIP_LLADDR_LEN == 6)
-  memcpy(linkaddr, ipaddr->u8 + 8, 3);
-  memcpy((uint8_t *)linkaddr + 3, ipaddr->u8 + 13, 3);
-  linkaddr->u8[0] ^= 0x02;
-#else
-#error uip-ds6.c cannot build interface address when UIP_LLADDR_LEN is not 6 or 8
-#endif
+  /* [Mavi Alp Research Proprietary Code Redacted] */
+
 }
 /*------------------------------------------------------------------------------*/
 const char *
