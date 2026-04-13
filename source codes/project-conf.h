@@ -4,6 +4,9 @@
  * Place this in your simulation or application directory (e.g., alongside Makefile).
  */
 
+ * \author
+ *         Hakan AYDIN <hakayd28@gmail.com>
+ */
 #ifndef PROJECT_CONF_H_
 #define PROJECT_CONF_H_
 
@@ -13,8 +16,8 @@
 /* Parameters from Eq. (2) in Article - Adaptive Cache Model */
 #define UMAY_MIN_CACHE_DURATION  3   /* T_min: 3 slotframes base */
 #define UMAY_DEFAULT_CACHE_DURATION 60 /* Fallback baseline duration */
-#define UMAY_ALPHA 12                 /* Extrapolated as 1.2 in floating point mapping */
-#define UMAY_BETA 5                   /* Extrapolated as 0.5 in floating point mapping */
+#define UMAY_ALPHA 1.2                 /* Extrapolated as 1.2 in floating point mapping */
+#define UMAY_BETA 0.5                  /* Extrapolated as 0.5 in floating point mapping */
 
 /* Advanced Robustness Switches */
 #define UMAY_CONSISTENCY_CHECK_ENABLED 1 /* FRM State Verification: Prevents "Zombie" cells */
