@@ -1,0 +1,5 @@
+# Topology       DSF  DSF_std  MSF      MSF_std  DeTAS  DeTAS_std  Umay6T  Umay6T_std
+Grid               980   38        1115  46        987     35          931      34
+Random             1100  44        1263  53        1149    41          1059     39
+Grid-Mobility      1205  50        1300  58        1161    45          1131     43
+Random-Mobility    1570  60        1550  59        1481    54          1690     66

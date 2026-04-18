@@ -1,0 +1,67 @@
+reset
+
+set terminal postscript eps enhanced color solid linewidth 1.0 "Helvetica,16"
+set output "40node_6top_speed_0_5.eps"
+
+dsf   = "#FF0000"
+msf   = "#0000FF"
+detas = "#00AA00"
+lasa  = "#FFA500"
+umay  = "#800080"
+
+set style data histogram
+set style histogram cluster gap 1.5
+set style fill solid 1.0 border -1
+set boxwidth 0.8
+
+set ylabel "6top Packets" font "Helvetica,20"
+set yrange [800:4000]
+
+set xtics font "Helvetica,16" rotate by -30
+set ytics font "Helvetica,16"
+set grid ytics
+
+set key left top box opaque font "Helvetica,15"
+set title "40 Nodes -- Speed = 0.5--2 m/s" font "Helvetica,18"
+
+plot "40node6topspeed_0_5.dat" using 2:xtic(1) title "DSF"     lc rgb dsf, \
+     ""                          using 3        title "MSF"      lc rgb msf, \
+     ""                          using 4        title "DeTAS"    lc rgb detas, \
+     ""                          using 5        title "LASA-R"   lc rgb lasa, \
+     ""                          using 6        title "Umay-6T"  lc rgb umay
+
+unset output
+###################################################################################################################################
+reset
+
+set terminal postscript eps enhanced color solid linewidth 1.0 "Helvetica,16"
+set output "40node_6top_speed_2_8.eps"
+
+dsf   = "#FF0000"
+msf   = "#0000FF"
+detas = "#00AA00"
+lasa  = "#FFA500"
+umay  = "#800080"
+
+set style data histogram
+set style histogram cluster gap 1.5
+set style fill solid 1.0 border -1
+set boxwidth 0.8
+
+set ylabel "6top Packets" font "Helvetica,20"
+set yrange [800:4000]
+
+set xtics font "Helvetica,16" rotate by -30
+set ytics font "Helvetica,16"
+set grid ytics
+
+set key left top box opaque font "Helvetica,15"
+set title "40 Nodes -- Speed = 0.5--2 m/s" font "Helvetica,18"
+
+plot "40node6topspeed_2_8.dat" using 2:xtic(1) title "DSF"     lc rgb dsf, \
+     ""                          using 3        title "MSF"      lc rgb msf, \
+     ""                          using 4        title "DeTAS"    lc rgb detas, \
+     ""                          using 5        title "LASA-R"   lc rgb lasa, \
+     ""                          using 6        title "Umay-6T"  lc rgb umay
+
+unset output
