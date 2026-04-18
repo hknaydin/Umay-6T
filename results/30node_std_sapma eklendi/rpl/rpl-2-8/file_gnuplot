@@ -1,0 +1,55 @@
+#############yeni
+###############################################################################
+# Common plot command
+plotcmd = 'plot "30noderplspeed_2_8.dat" using 2:3:xtic(1) title "DSF" lc rgb dsf, \
+                "" using 4:5 title "MSF" lc rgb msf, \
+                "" using 6:7 title "DeTAS" lc rgb detas, \
+                "" using 8:9 title "Umay-6T" lc rgb umay'
+
+###############################################################################
+# Colors
+dsf   = "#FF0000"
+msf   = "#0000FF"
+detas = "#00AA00"
+umay  = "#800080"
+
+###############################################################################
+# Histogram settings
+set style data histograms
+set style histogram errorbars gap 3 lw 1.2
+set style fill solid 1.0 border -1
+set boxwidth 1
+
+###############################################################################
+# Axes
+set ylabel "RPL Control Packets" font "Helvetica,20"
+set yrange [700:4700]
+set xtics font "Helvetica,16"
+set ytics font "Helvetica,16"
+set grid ytics
+
+###############################################################################
+# Legend
+set key left top
+set key box opaque
+set key spacing 1.2
+set key font "Helvetica,15"
+set key width 2
+
+###############################################################################
+# Title
+# set title "30 Nodes -- RPL Overhead (Speed = 2--8 m/s)" font "Helvetica,18"
+
+###############################################################################
+# PDF output
+set terminal pdfcairo enhanced color font "Helvetica,16" size 6in,4in
+set output "rpl_30node_speed_2_8.pdf"
+eval(plotcmd)
+unset output
+
+###############################################################################
+# EPS output
+set terminal postscript eps enhanced color solid linewidth 1.0 "Helvetica,16"
+set output "rpl_30node_speed_2_8.eps"
+eval(plotcmd)
+unset output

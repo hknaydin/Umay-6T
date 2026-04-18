@@ -1,0 +1,5 @@
+# Topology       DSF  DSF_std  MSF      MSF_std  DeTAS  DeTAS_std  Umay6T  Umay6T_std, 30 nodes, pdr packets, high-speed scenario
+Grid             89.66    0.6    89.6     0.5    90.0     0.6      88.8     0.7
+Random           86.97    0.7    89.2     0.8    90.6     0.8      86.8     0.6
+Grid-Mobility    79.07    1.8    78.0     2.1    78.8     1.5      81.1     1.3
+Random-Mobility  72.6     2.0    73.7     1.0    73.6     0.8      76.2     0.9

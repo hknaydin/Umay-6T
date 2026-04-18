@@ -1,0 +1,104 @@
+reset
+
+###############################################################################
+# Output
+set terminal postscript eps enhanced color solid linewidth 1.0 "Helvetica,16"
+set output "pdr_30node_speed_0_5.eps"
+
+###############################################################################
+# Colors
+dsf   = "#FF0000"
+msf   = "#0000FF"
+detas = "#00AA00"
+lasa  = "#FFA500"
+umay  = "#800080"
+
+###############################################################################
+# Histogram settings
+set style data histogram
+set style histogram cluster gap 1.5
+set style fill solid 1.0 border -1
+set boxwidth 0.8
+
+###############################################################################
+# Axes
+set ylabel "Packet Delivery Ratio (%)" font "Helvetica,20"
+set yrange [70:100]
+
+set xtics font "Helvetica,16" rotate by -30
+set ytics font "Helvetica,16"
+set grid ytics
+
+###############################################################################
+# Legend
+set key left top
+set key box opaque
+set key spacing 1.2
+set key font "Helvetica,15"
+
+###############################################################################
+# Title
+set title "30 Nodes -- PDR (Speed = 0--0.5 m/s)" font "Helvetica,18"
+
+###############################################################################
+# Plot
+plot "30nodepdrspeed_0_5.dat" using 2:xtic(1) title "DSF"      lc rgb dsf, \
+     ""                         using 3        title "MSF"      lc rgb msf, \
+     ""                         using 4        title "DeTAS"    lc rgb detas, \
+     ""                         using 5        title "LASA-R"   lc rgb lasa, \
+     ""                         using 6        title "Umay-6T"  lc rgb umay
+
+unset output
+##################################################################################################################################
+reset
+
+###############################################################################
+# Output
+set terminal postscript eps enhanced color solid linewidth 1.0 "Helvetica,16"
+set output "pdr_30node_speed_2_8.eps"
+
+###############################################################################
+# Colors
+dsf   = "#FF0000"
+msf   = "#0000FF"
+detas = "#00AA00"
+lasa  = "#FFA500"
+umay  = "#800080"
+
+###############################################################################
+# Histogram settings
+set style data histogram
+set style histogram cluster gap 1.5
+set style fill solid 1.0 border -1
+set boxwidth 0.8
+
+###############################################################################
+# Axes
+set ylabel "Packet Delivery Ratio (%)" font "Helvetica,20"
+set yrange [60:100]
+
+set xtics font "Helvetica,16" rotate by -30
+set ytics font "Helvetica,16"
+set grid ytics
+
+###############################################################################
+# Legend
+set key left top
+set key box opaque
+set key spacing 1.2
+set key font "Helvetica,15"
+
+###############################################################################
+# Title
+set title "30 Nodes -- PDR (Speed = 2--8 m/s)" font "Helvetica,18"
+
+###############################################################################
+# Plot
+plot "30nodepdrspeed_2_8.dat" using 2:xtic(1) title "DSF"      lc rgb dsf, \
+     ""                         using 3        title "MSF"      lc rgb msf, \
+     ""                         using 4        title "DeTAS"    lc rgb detas, \
+     ""                         using 5        title "LASA-R"   lc rgb lasa, \
+     ""                         using 6        title "Umay-6T"  lc rgb umay
+
+unset output
+
