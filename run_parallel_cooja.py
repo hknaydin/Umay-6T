@@ -1,3 +1,4 @@
+#test code: python3 /home/mavialp/Downloads/Umay/run_parallel_cooja.py "/home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/umay-6t h8l2/30noderandommobiliteenabled/mobil_network_random_30node_mobilite_enabled.csc" -n 5
 import os
 import re
 import random
