@@ -20,8 +20,9 @@ Add these to `project-conf.h`:
 /* Umay-6T Protocol Switch */
 #define UMAY_6T_ENABLED 1
 
-/* Parameters from Eq. (2) in Article */
-#define UMAY_DEFAULT_CACHE_DURATION 60 
+#define UMAY_DEFAULT_CACHE_DURATION 60  /* Default cache window in seconds */
+#define UMAY_TMIN_SLOTFRAMES 3          /* T_min baseline (slotframe cycles), Eq. (2) */
+
 #define UMAY_ALPHA 1.2
 #define UMAY_BETA 0.5
 
