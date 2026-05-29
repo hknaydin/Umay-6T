@@ -62,8 +62,8 @@ typedef struct cell {
   uint8_t lock;
 
   /* UMAY-6T EXTENSIONS */
-  uint8_t state;             
-  unsigned long expiry_time; 
+  uint8_t state;             /* shared with TSCH ISR -> volatile */
+  unsigned long expiry_time; /* cache expiry, seconds */
 } cell_t;
 ```
 
@@ -73,26 +73,34 @@ Step 2: Implement Robust Core Logic (`nbr-cell-table.c`)
 
 Modify nbr_cell_table_delete_nbr. Instead of freeing memory, we cache it.
 ```c
-void reactivate_cached_cells(nbr_cell_table_t *n) {
+/*
+ * Called when TSCH/6P observes that a neighbor has become unreachable.
+ * Instead of freeing the cell memory, mark every active cell as CACHED
+ * and schedule a hard-delete deadline at now + UMAY_DEFAULT_CACHE_DURATION.
+ */
+void umay_soft_delete_nbr(nbr_cell_table_t *n) {
     cell_t *c;
-for(c = CELL_HEAD(n); c != NULL; c = CELL_NEXT(c)) { ... }
-        if(c->state == CELL_STATE_VALIDATING || c->state == CELL_STATE_CACHED) {
-             /* Check Conflicts */
-             if(!is_cell_conflicting(c->slot_offset)) {
-                 c->state = CELL_STATE_ACTIVE;
-                 c->expiry_time = 0;
-             } else {
-                 /* Remove conflicted cell */
-                 // remove logic...
-             }
+    unsigned long now = clock_seconds();
+
+    for(c = CELL_HEAD(n); c != NULL; c = CELL_NEXT(c)) {     /* fixed loop */
+        if(c->state == CELL_STATE_ACTIVE) {
+            c->state       = CELL_STATE_CACHED;
+            c->expiry_time = now + UMAY_DEFAULT_CACHE_DURATION;
         }
     }
+    LOG_INFO("UMAY-6T: Neighbor soft-deleted, %u cells cached.\n",
+             nbr_cell_table_get_all_cell_count(&n->linkaddr));
 }
 ```
 #### B. Robust Fast Reconnection (Validation Logic)
 Replace the simple add logic with this robust state machine.
 
 ```c
+#include "net/mac/tsch/sixtop/sixp.h"
+#include "net/mac/tsch/sixtop/sixp-pkt.h"
+#include "net/routing/rpl-classic/rpl.h"   /* public RPL header */
+#include "net/ipv6/uip-ds6-nbr.h"
+
 /* Required Headers for RPL Sync */
 #include "net/routing/rpl-classic/rpl-private.h"
 #include "net/ipv6/uip-ds6-nbr.h"
@@ -135,7 +143,9 @@ Add this helper function to sync the IP layer.
 
 ```c
 
-/* Helper to reactivate cells after checks */
+/* Reactivate cached/validating cells after a successful consistency check
+ * (or fast reconnect when consistency check is disabled). Also informs RPL.
+ */
 void umay_reactivate_cells(nbr_cell_table_t *n) {
     cell_t *c;
     for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)) {
@@ -153,28 +163,37 @@ void umay_reactivate_cells(nbr_cell_table_t *n) {
     #endif
 }
 
-void umay_sync_rpl(linkaddr_t *lladdr) {
 #if UMAY_RPL_SYNC_ENABLED
+/* Marks the peer reachable in the IPv6 neighbor cache so that RPL
+ * stops penalizing the link as soon as TSCH cells are restored.
+ *
+ * NOTE: we construct the LINK-LOCAL (fe80::) address only. Global
+ *       reachability is restored by RPL itself once the link is up.
+ */
+
+void umay_sync_rpl(linkaddr_t *lladdr) {
     uip_ipaddr_t ipaddr;
     uip_ds6_nbr_t *nbr;
 
-    /* Construct Global IPv6 Address */
     uip_ip6addr(&ipaddr, 0xfe80, 0, 0, 0, 0, 0, 0, 0);
     uip_ds6_set_addr_iid(&ipaddr, (uip_lladdr_t *)lladdr);
 
-    /* Update Neighbor Table */
     nbr = uip_ds6_nbr_lookup(&ipaddr);
     if(nbr == NULL) {
-        nbr = uip_ds6_nbr_add(&ipaddr, (uip_lladdr_t *)lladdr, 0, NBR_REACHABLE);
+        nbr = uip_ds6_nbr_add(&ipaddr,
+                              (uip_lladdr_t *)lladdr,
+                              0,                       /* isrouter */
+                              NBR_REACHABLE,
+                              NBR_TABLE_REASON_IPV6_ND, /* fixed: was missing */
+                              NULL);                    /* fixed: was missing */
     } else {
         nbr->state = NBR_REACHABLE;
     }
-    
-    /* Trigger RPL Neighbor Update */
-    rpl_neighbor_set_reachable(nbr);
-    LOG_INFO("UMAY-6T: Synced RPL reachability for neighbor.\n");
-#endif
+
+    LOG_INFO("UMAY-6T: IPv6 neighbor state set to REACHABLE.\n");
 }
+#endif
+
 ```
 
 Step 3: Implement Consistency Callback (`6top-pce.c`)
@@ -184,50 +203,32 @@ When the `6P COUNT` response arrives, we decide the fate of the cached cells.
 **Action:** Update `ds_process_response` (or create a specific callback).
 
 ```c
-void umay_consistency_callback(linkaddr_t *peer, uint8_t status, uint16_t peer_cell_count) {
-    nbr_cell_table_t *n = nbr_cell_table_get_nbr(peer);
-    uint16_t local_count = nbr_cell_table_get_all_cell_count(peer);
-    
+void umay_consistency_callback(const linkaddr_t *peer,
+                               uint8_t status,
+                               uint16_t peer_cell_count) {
+    nbr_cell_table_t *n     = nbr_cell_table_get_nbr(peer);
+    uint16_t local_count    = nbr_cell_table_get_all_cell_count(peer);
+
+    if(n == NULL) {
+        LOG_WARN("UMAY-6T: COUNT response for unknown peer, ignoring.\n");
+        return;
+    }
+
     if(status == SIXP_RC_SUCCESS && peer_cell_count == local_count) {
-        /* SUCCESS: Cells match! Reactivate. */
-        LOG_INFO("UMAY-6T: Consistency Verified! Reactivating cells.\n");
-        reactivate_cached_cells(n); /* Sets state to ACTIVE */
-        
-        /* Sync RPL now that link is stable */
-        umay_sync_rpl(peer);
-        
+        LOG_INFO("UMAY-6T: Consistency verified (%u cells). Reactivating.\n",
+                 local_count);
+        umay_reactivate_cells(n);          /* RPL sync happens inside */
     } else {
-        /* FAILURE: Mismatch (Node Rebooted?). Hard Delete. */
-        LOG_WARN("UMAY-6T: Consistency Failed (Local:%u Peer:%u). Hard Resetting.\n", 
+        LOG_WARN("UMAY-6T: Consistency failed (local=%u peer=%u). Hard reset.\n",
                  local_count, peer_cell_count);
-        nbr_cell_table_del_all_nbr_cells(peer, CELL_TYPE_ALL); // Hard Delete
-        // Trigger standard negotiation...
+        nbr_cell_table_del_all_nbr_cells(peer, CELL_TYPE_ALL);
+        /* Standard 6P ADD negotiation will be triggered by the SF
+         * on the next packet enqueue, no explicit call needed. */
     }
 }
 ```
 
-Step 4: The `reactivate_cached_cells` Helper
-
-Consolidate the activation logic.
-
-```c
-void reactivate_cached_cells(nbr_cell_table_t *n) {
-    cell_t *c;
-    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)) {
-        if(c->state == CELL_STATE_VALIDATING || c->state == CELL_STATE_CACHED) {
-             /* Check Conflicts */
-             if(!is_cell_conflicting(c->slot_offset)) {
-                 c->state = CELL_STATE_ACTIVE;
-                 c->expiry_time = 0;
-             } else {
-                 /* Remove conflicted cell */
-                 // remove logic...
-             }
-        }
-    }
-}
-```
-Step 5: Scheduler Logic (4emac-6top-scheduler-minimal.c)
+Step 4: Scheduler Logic (4emac-6top-scheduler-minimal.c)
 
 Ensure the scheduler respects the cell states.
 
@@ -245,7 +246,7 @@ if(ret_val != FOURE_SLOT_UNSCHEDULED) {
 }
 ```
 
-Step 6: Cache Maintenance & Fallback (Garbage Collection)
+Step 5: Cache Maintenance & Fallback (Garbage Collection)
 
 To comply with the fail-safe mechanism detailed in Algorithm 3 of the Umay-6T manuscript, we must implement a periodic routine to permanently delete soft-state cells if a neighbor fails to return before $T_{cache}$ expires.
 
@@ -290,10 +291,10 @@ To address reviewer concerns regarding reproduction and empirical validation, Um
 
 ### Code Availability
 The full source code of the modified Contiki-NG 4emac MAC layer, custom 6P scheduler, and the simulation configuration files (.csc) are publicly available on GitHub to ensure complete reproducibility of the manuscript's findings.
-* **Repository Link:** [github.com/mavialp/Umay-6T]
+* **Repository Link:** <https://github.com/hknaydin/Umay-6T>
 
 ### Cooja Simulation Setup
-To reproduce the numerical results presented in the paper (e.g., 17% reduction in control overhead), simulators must use the following configuration parameters:
+To reproduce the numerical results presented in the paper(approximately 20% average and up to ~40% peak reduction in combined 6P + RPL control overhead under high mobility), simulators must use the following configuration parameters:
 - **Mobility Model:** BonnMotion Random Waypoint implementation loaded dynamically into Cooja.
 - **Node Type:** Exp5438 Mote
 - **Compile Flags:** Ensure `UMAY_6T_ENABLED=1`, `UMAY_CONSISTENCY_CHECK_ENABLED=1`, and `UMAY_RPL_SYNC_ENABLED=1` are defined in your `project-conf.h`.
