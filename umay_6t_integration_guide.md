@@ -30,9 +30,6 @@ Add these to `project-conf.h`:
 #define UMAY_6T_ENABLED (SCHEDULING_FUNCTION == SF_UMAY)
 
 
-/* Umay-6T Protocol Switch */
-#define UMAY_6T_ENABLED 1
-
 /* Cache window. All cache timings are in SECONDS (clock_seconds() domain). */
 #define UMAY_DEFAULT_CACHE_DURATION 60
 
