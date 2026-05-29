@@ -20,15 +20,26 @@ Add these to `project-conf.h`:
 /* Umay-6T Protocol Switch */
 #define UMAY_6T_ENABLED 1
 
-#define UMAY_DEFAULT_CACHE_DURATION 60  /* Default cache window in seconds */
-#define UMAY_TMIN_SLOTFRAMES 3          /* T_min baseline (slotframe cycles), Eq. (2) */
+/* Cache window. All cache timings are in SECONDS (clock_seconds() domain). */
+#define UMAY_DEFAULT_CACHE_DURATION 60
 
+
+
+/* T_cache = max(T_min, alpha * RTT_est + beta * mobility_factor), see Eq. (2).
+ * T_min is expressed in slotframes and converted to seconds in
+ * umay_compute_cache_duration() using TSCH slotframe period.
+ */
+#define UMAY_TMIN_SLOTFRAMES 3         
 #define UMAY_ALPHA 1.2
 #define UMAY_BETA 0.5
 
 /* Advanced Robustness Switches */
 #define UMAY_CONSISTENCY_CHECK_ENABLED 1 /* Prevents "Zombie" cells */
 #define UMAY_RPL_SYNC_ENABLED 1          /* Cross-layer optimization */
+
+/* Validation phase deadline. If 6P COUNT response does not arrive in time,
+ * cached cells are hard-deleted. */
+#define UMAY_VALIDATION_TIMEOUT 4   /* seconds */
 
 /* Cell States */
 #define CELL_STATE_ACTIVE 0
