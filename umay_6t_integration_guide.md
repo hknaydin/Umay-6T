@@ -64,7 +64,7 @@ Modify nbr_cell_table_delete_nbr. Instead of freeing memory, we cache it.
 ```c
 void reactivate_cached_cells(nbr_cell_table_t *n) {
     cell_t *c;
-    for(c = CELL_HEAD(n); c != NULL; CELL_NEXT(c)) {
+for(c = CELL_HEAD(n); c != NULL; c = CELL_NEXT(c)) { ... }
         if(c->state == CELL_STATE_VALIDATING || c->state == CELL_STATE_CACHED) {
              /* Check Conflicts */
              if(!is_cell_conflicting(c->slot_offset)) {
