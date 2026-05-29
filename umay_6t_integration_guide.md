@@ -284,9 +284,9 @@ The full source code of the modified Contiki-NG 4emac MAC layer, custom 6P sched
 ### Cooja Simulation Setup
 To reproduce the numerical results presented in the paper (e.g., 17% reduction in control overhead), simulators must use the following configuration parameters:
 - **Mobility Model:** BonnMotion Random Waypoint implementation loaded dynamically into Cooja.
-- **Node Type:** Cooja Mote (with 1 MB RAM limit simulated)
+- **Node Type:** Exp5438 Mote
 - **Compile Flags:** Ensure `UMAY_6T_ENABLED=1`, `UMAY_CONSISTENCY_CHECK_ENABLED=1`, and `UMAY_RPL_SYNC_ENABLED=1` are defined in your `project-conf.h`.
-- **Make Target:** Compile using the standard `make TARGET=cooja` within your simulation directory.
+- **Make Target:** Compile using the standard `make TARGET=exp5438` within your simulation directory.
 
 ### Testbed Deployment (Future Work)
 When transitioning from Cooja to industrial testbeds (e.g., Umote / Mahmote) as discussed in the paper, ensure that hardware timers appropriately reflect the `clock_seconds()` precision required by the Cache Maintenance routine.
