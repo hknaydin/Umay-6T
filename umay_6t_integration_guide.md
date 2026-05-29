@@ -17,6 +17,19 @@ Umay-6T introduces "Soft State" management to 6TiSCH.
 Add these to `project-conf.h`:
 
 ```c
+
+/* Scheduling Function (SF) Selection Baselines */
+#define SF_MSF      0
+#define SF_DSF      1
+#define SF_DeTAS    2
+#define SF_UMAY     3
+#ifndef SCHEDULING_FUNCTION
+#define SCHEDULING_FUNCTION SF_UMAY /* Set to SF_MSF, SF_DSF, SF_DeTAS, or SF_UMAY to select SF */
+#endif
+/* Umay-6T Protocol Switch (Automatically enabled if UMAY is selected) */
+#define UMAY_6T_ENABLED (SCHEDULING_FUNCTION == SF_UMAY)
+
+
 /* Umay-6T Protocol Switch */
 #define UMAY_6T_ENABLED 1
 
