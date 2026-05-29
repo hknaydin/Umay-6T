@@ -278,7 +278,7 @@ To address reviewer concerns regarding reproduction and empirical validation, Um
 
 ### Code Availability
 The full source code of the modified Contiki-NG 4emac MAC layer, custom 6P scheduler, and the simulation configuration files (.csc) are publicly available on GitHub to ensure complete reproducibility of the manuscript's findings.
-* **Repository Link:** [Insert GitHub Link Here, e.g., github.com/mavialp/Umay-6T]
+* **Repository Link:** [github.com/mavialp/Umay-6T]
 
 ### Cooja Simulation Setup
 To reproduce the numerical results presented in the paper (e.g., 17% reduction in control overhead), simulators must use the following configuration parameters:
