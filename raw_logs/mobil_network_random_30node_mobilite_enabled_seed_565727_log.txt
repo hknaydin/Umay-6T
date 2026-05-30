@@ -1,0 +1,75 @@
+ INFO [main] (Cooja.java:1316) - > Starting Cooja
+ INFO [main] (Cooja.java:2857) - External tools default settings: /external_tools_linux_64.config
+ INFO [main] (Cooja.java:2887) - External tools user settings: /home/mavialp/.cooja.user.properties
+FATAL [main] (Cooja.java:1941) - No plugin class: class org.contikios.cooja.plugins.CollectViewFull: org/jfree/data/time/RegularTimePeriod
+ INFO [main] (Simulation.java:422) - Simulation random seed: 565727
+ INFO [main] (CompileContiki.java:140) - > make border-router-server.exp5438 TARGET=exp5438 
+Message:
+Message:> make border-router-server.exp5438 TARGET=exp5438 
+Message:make: 'border-router-server.exp5438' is up to date.
+ INFO [main] (CompileContiki.java:140) - > make border-router-client.exp5438 TARGET=exp5438 
+Message:
+Message:> make border-router-client.exp5438 TARGET=exp5438 
+Message:make: 'border-router-client.exp5438' is up to date.
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-server/border-router-server.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (MspMote.java:235) - Loading firmware from: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/examples/tsch/rpl-udp/border-router-client/border-router-client.exp5438
+ INFO [main] (Cooja.java:1782) - Visualized plugin was not started: class org.contikios.cooja.plugins.SimControl
+ INFO [main] (Cooja.java:1782) - Visualized plugin was not started: class org.contikios.cooja.plugins.Visualizer
+ INFO [main] (Cooja.java:1782) - Visualized plugin was not started: class org.contikios.cooja.plugins.TimeLine
+ INFO [main] (ScriptRunner.java:438) - Test script deactivated
+ INFO [main] (LogScriptEngine.java:265) - Script timeout in 4000000 ms
+ INFO [main] (ScriptRunner.java:395) - Test script activated
+ INFO [Thread-2] (Simulation.java:253) - Simulation main loop started, system time: 1777217859949
+ INFO [main] (Mobility.java:84) - Mobility plugin started at (ms): 126
+ INFO [main] (Mobility.java:116) - Parsing position file: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/tools/cooja/apps/mobility/positions.dat
+ INFO [main] (Mobility.java:141) - Loaded 21606 positions
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 5.00%, done in 3959.2 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 10.00%, done in 4087.0 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 15.00%, done in 3988.2 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 20.00%, done in 4162.8 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 25.00%, done in 4347.5 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 30.00%, done in 4485.6 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 35.00%, done in 4482.3 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 40.00%, done in 4411.4 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 45.00%, done in 4292.9 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 50.00%, done in 4010.5 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 55.00%, done in 3698.4 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 60.00%, done in 3338.9 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 65.00%, done in 2957.7 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 70.00%, done in 3731.5 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 75.00%, done in 3042.5 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 80.00%, done in 2384.9 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 85.00%, done in 1754.8 sec
+ INFO [Thread-2] (LogScriptEngine.java:389) - Test script at 90.00%, done in 1153.7 sec
+ INFO [Thread-1] (LogScriptEngine.java:309) - Test script finished
+ INFO [Thread-2] (Simulation.java:312) - Simulation main loop stopped, system time: 1777228243090	Duration: 10383141 ms	Simulated time 3600003 ms	Ratio 0.3467161815485314
+ INFO [AWT-EventQueue-1] (ScriptRunner.java:438) - Test script deactivated

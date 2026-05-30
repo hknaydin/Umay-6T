@@ -1,0 +1,14 @@
+Buildfile: /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/tools/cooja/build.xml
+
+init:
+
+compile:
+
+copy configs:
+
+jar_cooja:
+
+BUILD FAILED
+/home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/tools/cooja/build.xml:242: Problem reading /home/mavialp/Downloads/Umay/6tisch-ng-sra-v17/6tisch-ng-sra/tools/cooja/dist/cooja.jar
+
+Total time: 3 seconds
