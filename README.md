@@ -1,3 +1,5 @@
+<img width="2260" height="1258" alt="umay6t_mechanism (1)" src="https://github.com/user-attachments/assets/995cce03-efe3-4ea0-b407-861b40d8893e" />
+
 # Umay-6T Data Reproducibility Package
 
 This repository contains the data reproducibility package for the **Umay-6T: Mobility-Resilient Cell Caching for Uninterrupted 6TiSCH Networks** manuscript.
