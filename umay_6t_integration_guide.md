@@ -6389,8 +6389,6 @@
     </clipPath>
   </defs>
 </svg>
-g umay6t_mechanism.svg…]()
-
 
 # Umay-6T Integration Guide & User Manual (Publication-Ready / Advanced)
 <p class="justify">
