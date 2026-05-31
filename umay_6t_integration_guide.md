@@ -3,6 +3,28 @@
 This document is the **definitive guide** for integrating the Umay-6T protocol extensions into the <a href="https://www.mavialp.com/tr/">Mavi Alp</a> "4emac" Contiki-NG stack. Unlike basic implementations, this version includes critical **Robustness Features** demanded by academic reviewers: **Consistency Checks** (handling node reboots) and **Cross-Layer Support** (RPL synchronization).
 </p>
 
+## Motivation: Why Was This Study Conducted?
+<p class="justify">
+Industrial Internet of Things (IIoT) applications require highly reliable and deterministic communication. The **6TiSCH** architecture achieves this by scheduling transmissions in a strict time-frequency matrix (Slotframe). However, existing 6TiSCH protocols were primarily designed for **static topologies**. In real-world industrial scenarios (e.g., mobile robots, automated guided vehicles), nodes frequently move, causing temporary physical disconnections or short-term RF interference. When these transient disconnections happen, standard 6TiSCH protocols fail to adapt efficiently, leading to massive packet drops, huge delays, and severe network instability. **Umay-6T** was developed specifically to solve this "mobile reconnection" problem without rewriting the entire standard.
+</p>
+
+---
+## The Baseline: How Default Scheduling Functions Work (and Fail)
+To understand Umay-6T, we must first look at how standard Scheduling Functions (like MSF or DSF) handle cell allocation.
+1. **Allocation (6P ADD):** When Node A wants to send data to Node B, a 2-step or 3-step handshake occurs over the air. They agree on a specific time and frequency (a "cell").
+2. **Disconnection:** If Node A moves behind an obstacle or briefly goes out of range, the RPL routing layer and the MAC layer detect consecutive transmission failures.
+3. **Hard Deletion (The Failure Point):** The default SF interprets this temporary 5-second disconnection as a *permanent topology change*. It immediately triggers a `6P DELETE` and permanently erases the allocated cells from memory.
+4. **Reconnection Penalty:** If Node A returns to the coverage area just a few seconds later, it has to start from scratch. It must initiate a completely new, energy-heavy `6P ADD` transaction just to get the exact same cell it had moments ago.
+---
+
+
+## The Solution: How Umay-6T Operates in Mobile Scenarios
+Umay-6T redefines the cell lifecycle from a "Hard-State" (allocate/delete) to a **"Soft-State" (allocate/cache/reactivate)** model. This is especially critical in mobile scenarios driven by BonnMotion traces.
+* **Cell Retention Mechanism (CRM) & BonnMotion Integration:** When a mobile node disconnects, instead of deleting the `tsch_link` struct from memory, Umay-6T removes the transmission flags and assigns a custom `CELL_STATE_CACHED` state. The cell gets an expiration timestamp ($T_{cache}$). In our Cooja simulations, nodes' ground-truth positions ($X, Y$) are dynamically updated via **BonnMotion** trace files. Umay-6T reads this spatial displacement to calculate the instantaneous velocity ($v_n$) and adaptively calculates the optimal $T_{cache}$ duration for that specific mobile node.
+* **Fast Reconnection Mechanism (FRM):** When the mobile node re-enters the communication range (e.g., an EB or DIO is heard), Umay-6T verifies state consistency. If there is no time-frequency conflict, Umay-6T simply restores the active state of the cached cell. **No 6P ADD messages are transmitted over the air!**
+* **Modified Cell Scheduler:** To prevent latency spikes upon reconnection, Umay-6T maintains a separate `PendingReacts` list for newly restored cells. The TSCH MAC layer explicitly prioritizes this list, forcing the node to immediately transmit its buffered packets on the reactivated cell without waiting for a full slotframe cycle.
+---
+
 ## 1. Overview & Key Concepts
 
 Umay-6T introduces "Soft State" management to 6TiSCH.
